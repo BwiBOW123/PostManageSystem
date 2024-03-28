@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  oracle:
+    image: container-registry.oracle.com/database/enterprise:21.3.0.0
+    container_name: Oracle
+    environment:
+      - ORACLE_SID=ORCLCDB
+      - ORACLE_PDB=PDB1
+      - ORACLE_PWD=1234
+      - ORACLE_CHARACTERSET=AL32UTF8
+      - ORACLE_EDITION=EE
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - ./listener.ora:/opt/oracle/product/21c/dbhome_1/network/admin/listener.ora
+      - ./tnsnames.ora:/opt/oracle/product/21c/dbhome_1/network/admin/tnsnames.ora
+    networks:
+      - bridge-network
+
+  ssh:
+    image: rastasheep/ubuntu-sshd:18.04
+    container_name: Oracle_SSH
+    ports:
+      - "2222:22"
+    environment:
+      - SSH_USER=root
+      - SSH_PASSWORD=1234
+    networks:
+      - bridge-network
+
+networks:
+  bridge-network:
+    driver: bridge
+
+volumes:
+  oracle_data:
